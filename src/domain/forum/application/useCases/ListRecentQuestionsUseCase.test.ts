@@ -25,11 +25,11 @@ describe("List Recent Questions Use Case", () => {
     await inMemoryQuestionsRepository.create(question2);
     await inMemoryQuestionsRepository.create(question3);
 
-    const { questions } = await sut.execute({
+    const result = await sut.execute({
       page: 1,
     });
 
-    expect(questions).toEqual([question3, question1, question2]);
+    expect(result.value?.questions).toEqual([question3, question1, question2]);
   });
 
   it("should return the quantity page correctly", async () => {
@@ -41,10 +41,10 @@ describe("List Recent Questions Use Case", () => {
       await inMemoryQuestionsRepository.create(question);
     });
 
-    const { questions } = await sut.execute({
+    const result = await sut.execute({
       page: 1,
     });
 
-    expect(questions.length).toBe(20);
+    expect(result.value?.questions.length).toBe(20);
   });
 });

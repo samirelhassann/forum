@@ -5,6 +5,7 @@ import { InMemoryQuestionsRepository } from "test/repositories/InMemoryQuestions
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ChooseQuestionBestAnswerUseCase } from "./ChooseQuestionBestAnswerUseCase";
+import { NotAllowedError } from "./errors/NotAllowedError";
 import { UniqueEntityId } from "@/core/entity/UniqueEntityId";
 
 let inMemoryAnswersRepository: InMemoryAnswersRepository;
@@ -33,10 +34,12 @@ describe("Choose Question best answer", () => {
 
     await inMemoryAnswersRepository.create(answer);
 
-    await sut.execute({
+    const result = await sut.execute({
       answerId: answer.id.toString(),
       authorId: question.authorId.toString(),
     });
+
+    expect(result.isRight()).toBeTruthy();
 
     expect(inMemoryQuestionsRepository.items[0].bestAnswerId).toBe(answer.id);
   });
@@ -52,11 +55,12 @@ describe("Choose Question best answer", () => {
     await inMemoryQuestionsRepository.create(question);
     await inMemoryAnswersRepository.create(answer);
 
-    expect(() => {
-      return sut.execute({
-        answerId: answer.id.toString(),
-        authorId: "author-2",
-      });
-    }).rejects.toBeInstanceOf(Error);
+    const result = await sut.execute({
+      answerId: answer.id.toString(),
+      authorId: "author-2",
+    });
+
+    expect(result.isLeft()).toBeTruthy();
+    expect(result.value).toBeInstanceOf(NotAllowedError);
   });
 });

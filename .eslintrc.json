@@ -23,6 +23,7 @@
         "unused-imports"
     ],
     "rules": {
+        "@typescript-eslint/ban-types": 0,
         "import/no-extraneous-dependencies": 0,
         "no-empty-function": "off",
         "import/named": 0,

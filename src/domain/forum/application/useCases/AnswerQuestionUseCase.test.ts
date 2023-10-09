@@ -7,6 +7,8 @@ let inMemoryAnswerRepository: InMemoryAnswersRepository;
 let sut: AnswerQuestionUseCase;
 
 describe("Given the Answer Question Use Case", () => {
+  const content = "New Answer";
+
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -15,15 +17,15 @@ describe("Given the Answer Question Use Case", () => {
   });
 
   it("should create an answer", async () => {
-    const { answer } = await sut.execute({
+    const result = await sut.execute({
       instructorId: "1",
       questionId: "1",
-      content: "New Answer",
+      content,
     });
 
-    expect(answer.content).toEqual("New Answer");
+    expect(result.isRight()).toBeTruthy();
     expect(
-      inMemoryAnswerRepository.items.find((i) => i.content === "New Answer")
+      inMemoryAnswerRepository.items.find((i) => i.content === content)
     ).toBeTruthy();
   });
 });

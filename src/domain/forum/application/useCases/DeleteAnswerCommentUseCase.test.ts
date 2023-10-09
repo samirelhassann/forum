@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DeleteAnswerCommentUseCase } from "./DeleteAnswerCommentUseCase";
+import { NotAllowedError } from "./errors/NotAllowedError";
+import { ResourceNotFoundError } from "./errors/ResourceNotFoundError";
 import { UniqueEntityId } from "@/core/entity/UniqueEntityId";
 import { makeAnswerComment } from "@test/factories/MakeAnswerComment";
 import { InMemoryAnswerCommentRepository } from "@test/repositories/InMemoryAnswerCommentRepository";
@@ -51,12 +53,13 @@ describe("Given the Delete Answer Comment USe Case", () => {
 
     await inMemoryAnswerCommentRepository.create(answerComment);
 
-    expect(() => {
-      return sut.execute({
-        authorId,
-        answerCommentId: "different-answer-comment-id",
-      });
-    }).rejects.toBeInstanceOf(Error);
+    const result = await sut.execute({
+      authorId,
+      answerCommentId: "different-answer-comment-id",
+    });
+
+    expect(result.isLeft()).toBeTruthy();
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError);
   });
 
   it("should throw an error when the authorId is different", async () => {
@@ -69,11 +72,12 @@ describe("Given the Delete Answer Comment USe Case", () => {
 
     await inMemoryAnswerCommentRepository.create(answerComment);
 
-    expect(() => {
-      return sut.execute({
-        authorId: "different-author-id",
-        answerCommentId,
-      });
-    }).rejects.toBeInstanceOf(Error);
+    const result = await sut.execute({
+      authorId: "different-author-id",
+      answerCommentId,
+    });
+
+    expect(result.isLeft()).toBeTruthy();
+    expect(result.value).toBeInstanceOf(NotAllowedError);
   });
 });

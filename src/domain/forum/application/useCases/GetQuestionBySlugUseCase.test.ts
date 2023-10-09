@@ -25,10 +25,10 @@ describe("Given the get question by slug use case", () => {
 
     inMemoryQuestionsRepository.create(questionToCreate);
 
-    const { question } = await sut.execute({
+    const result = await sut.execute({
       slug: mockSlug,
     });
 
-    expect(question.slug.value).toEqual(mockSlug);
+    expect(result.value?.question.slug.value).toEqual(mockSlug);
   });
 });

@@ -1,13 +1,17 @@
 import { Question } from "../../enterprise/entities/Question";
 import { QuestionsRepository } from "../repositories/QuestionsRepository";
+import { Either, right } from "@/core/Either";
 
 interface ListRecentQuestionsUseCaseRequest {
   page: number;
 }
 
-interface ListRecentQuestionsUseCaseResponse {
-  questions: Question[];
-}
+type ListRecentQuestionsUseCaseResponse = Either<
+  null,
+  {
+    questions: Question[];
+  }
+>;
 
 export class ListRecentQuestionsUseCase {
   constructor(private questionRepository: QuestionsRepository) {}
@@ -17,6 +21,6 @@ export class ListRecentQuestionsUseCase {
   }: ListRecentQuestionsUseCaseRequest): Promise<ListRecentQuestionsUseCaseResponse> {
     const questions = await this.questionRepository.findManyRecent({ page });
 
-    return { questions };
+    return right({ questions });
   }
 }

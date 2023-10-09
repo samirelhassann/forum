@@ -27,12 +27,12 @@ describe("List Question Comments Use Case", () => {
       await inMemoryQuestionCommentRepository.create(questionComment);
     });
 
-    const { comments } = await sut.execute({
+    const result = await sut.execute({
       questionId,
       page: 1,
     });
 
-    expect(comments.length).toEqual(3);
+    expect(result.value?.comments.length).toEqual(3);
   });
 
   it("should return the quantity page correctly", async () => {
@@ -44,11 +44,11 @@ describe("List Question Comments Use Case", () => {
       await inMemoryQuestionCommentRepository.create(questionComment);
     });
 
-    const { comments } = await sut.execute({
+    const result = await sut.execute({
       questionId,
       page: 2,
     });
 
-    expect(comments).toHaveLength(2);
+    expect(result.value?.comments).toHaveLength(2);
   });
 });

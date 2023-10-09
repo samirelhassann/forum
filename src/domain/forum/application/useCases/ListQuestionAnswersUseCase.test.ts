@@ -33,12 +33,12 @@ describe("List Question Answers Use Case", () => {
     await inMemoryAnswersRepository.create(answer2);
     await inMemoryAnswersRepository.create(answer3);
 
-    const { answers } = await sut.execute({
+    const result = await sut.execute({
       questionId: questionIdMock,
       page: 1,
     });
 
-    expect(answers.length).toEqual(2);
+    expect(result.value?.answers.length).toEqual(2);
   });
 
   it("should return the quantity page correctly", async () => {
@@ -49,11 +49,11 @@ describe("List Question Answers Use Case", () => {
       await inMemoryAnswersRepository.create(question);
     });
 
-    const { answers } = await sut.execute({
+    const result = await sut.execute({
       questionId: "question-1",
       page: 1,
     });
 
-    expect(answers).toHaveLength(20);
+    expect(result.value?.answers).toHaveLength(20);
   });
 });

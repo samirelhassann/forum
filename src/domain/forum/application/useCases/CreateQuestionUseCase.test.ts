@@ -15,12 +15,13 @@ describe("Given the create question use case", () => {
   });
 
   it("should create an answer", async () => {
-    const { question } = await sut.execute({
+    const result = await sut.execute({
       authorId: "1",
       title: "1",
       content: "New Question",
     });
 
-    expect(question.content).toEqual("New Question");
+    expect(result.isRight()).toBeTruthy();
+    expect(result.value?.question.content).toEqual("New Question");
   });
 });

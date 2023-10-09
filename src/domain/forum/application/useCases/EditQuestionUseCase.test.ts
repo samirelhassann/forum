@@ -3,6 +3,7 @@ import { InMemoryQuestionsRepository } from "test/repositories/InMemoryQuestions
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EditQuestionUseCase } from "./EditQuestionUseCase";
+import { NotAllowedError } from "./errors/NotAllowedError";
 import { UniqueEntityId } from "@/core/entity/UniqueEntityId";
 
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
@@ -55,13 +56,14 @@ describe("Given the delete question use case", () => {
 
     inMemoryQuestionsRepository.create(questionToCreate);
 
-    expect(() => {
-      return sut.execute({
-        authorId: "different-authorId",
-        questionId: mockId,
-        title: mockTitle,
-        content: mockContent,
-      });
-    }).rejects.toBeInstanceOf(Error);
+    const result = await sut.execute({
+      authorId: "different-authorId",
+      questionId: mockId,
+      title: mockTitle,
+      content: mockContent,
+    });
+
+    expect(result.isLeft()).toBeTruthy();
+    expect(result.value).toBeInstanceOf(NotAllowedError);
   });
 });

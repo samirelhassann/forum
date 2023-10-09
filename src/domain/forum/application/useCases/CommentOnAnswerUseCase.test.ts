@@ -29,12 +29,12 @@ describe("Given the Comment on Answer Use Case", () => {
 
     await inMemoryAnswersRepository.create(answer);
 
-    const { answerComment } = await sut.execute({
+    const result = await sut.execute({
       authorId: "1",
       answerId: answer.id.toString(),
       content,
     });
 
-    expect(answerComment.content).toEqual(content);
+    expect(result.value?.answerComment.content).toEqual(content);
   });
 });
