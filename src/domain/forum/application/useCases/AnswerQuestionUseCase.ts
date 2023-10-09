@@ -1,13 +1,17 @@
 /* eslint-disable no-empty-function */
 
-import { Answer } from "../entities/Answer";
-import { AnswersRepository } from "../repositories/AnswersRepository";
+import { Answer } from "../../enterprise/entities/Answer";
 import { UniqueEntityId } from "@/core/entity/UniqueEntityId";
+import { AnswersRepository } from "@/domain/forum/application/repositories/AnswersRepository";
 
 interface AnswerQuestionUseCaseRequest {
   instructorId: string;
   questionId: string;
   content: string;
+}
+
+interface AnswerQuestionUseCaseResponse {
+  answer: Answer;
 }
 
 export class AnswerQuestionUseCase {
@@ -17,7 +21,7 @@ export class AnswerQuestionUseCase {
     instructorId,
     questionId,
     content,
-  }: AnswerQuestionUseCaseRequest) {
+  }: AnswerQuestionUseCaseRequest): Promise<AnswerQuestionUseCaseResponse> {
     const answer = new Answer({
       content,
       authorId: new UniqueEntityId(instructorId),
@@ -26,6 +30,6 @@ export class AnswerQuestionUseCase {
 
     await this.answerRepository.create(answer);
 
-    return answer;
+    return { answer };
   }
 }

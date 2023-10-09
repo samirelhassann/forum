@@ -2,7 +2,7 @@ import { Entity } from "@/core/entity/Entity";
 import { UniqueEntityId } from "@/core/entity/UniqueEntityId";
 import { Optional } from "@/core/types/optional";
 
-interface AnswerProps {
+export interface AnswerProps {
   authorId: UniqueEntityId;
   questionId: UniqueEntityId;
   content: string;
@@ -12,7 +12,7 @@ interface AnswerProps {
 
 export class Answer extends Entity<AnswerProps> {
   constructor(props: Optional<AnswerProps, "createdAt">, id?: UniqueEntityId) {
-    super({ ...props, createdAt: new Date() }, id);
+    super({ ...props, createdAt: props.createdAt ?? new Date() }, id);
   }
 
   get authorId() {
@@ -21,10 +21,6 @@ export class Answer extends Entity<AnswerProps> {
 
   get questionId() {
     return this.props.questionId;
-  }
-
-  get content() {
-    return this.props.content;
   }
 
   get createdAt() {
@@ -39,5 +35,16 @@ export class Answer extends Entity<AnswerProps> {
     return this.content.substring(0, 120).trimEnd().concat("...");
   }
 
-  
+  get content() {
+    return this.props.content;
+  }
+
+  set content(value: string) {
+    this.props.content = value;
+    this.touch();
+  }
+
+  private touch() {
+    this.props.updatedAt = new Date();
+  }
 }
