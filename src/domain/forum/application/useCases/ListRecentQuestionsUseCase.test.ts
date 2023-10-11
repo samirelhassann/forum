@@ -3,16 +3,23 @@ import { InMemoryQuestionsRepository } from "test/repositories/InMemoryQuestions
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ListRecentQuestionsUseCase } from "./ListRecentQuestionsUseCase";
-import { UniqueEntityId } from "@/core/entity/UniqueEntityId";
+import { UniqueEntityId } from "@/core/entities/UniqueEntityId";
+import { InMemoryQuestionAttachmentsRepository } from "@test/repositories/InMemoryQuestionAttachmentsRepository";
 
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
+let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachmentsRepository;
 let sut: ListRecentQuestionsUseCase;
 
 describe("List Recent Questions Use Case", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    inMemoryQuestionsRepository = new InMemoryQuestionsRepository();
+    inMemoryQuestionAttachmentsRepository =
+      new InMemoryQuestionAttachmentsRepository();
+
+    inMemoryQuestionsRepository = new InMemoryQuestionsRepository(
+      inMemoryQuestionAttachmentsRepository
+    );
     sut = new ListRecentQuestionsUseCase(inMemoryQuestionsRepository);
   });
 

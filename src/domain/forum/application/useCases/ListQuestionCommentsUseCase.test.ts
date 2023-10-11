@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ListQuestionCommentsUseCase } from "./ListQuestionCommentsUseCase";
-import { UniqueEntityId } from "@/core/entity/UniqueEntityId";
+import { UniqueEntityId } from "@/core/entities/UniqueEntityId";
 import { makeQuestionComment } from "@test/factories/MakeQuestionComment";
 import { InMemoryQuestionCommentRepository } from "@test/repositories/InMemoryQuestionCommentRepository";
 

@@ -3,17 +3,24 @@ import { InMemoryQuestionsRepository } from "test/repositories/InMemoryQuestions
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DeleteQuestionUseCase } from "./DeleteQuestionUseCase";
-import { NotAllowedError } from "./errors/NotAllowedError";
-import { UniqueEntityId } from "@/core/entity/UniqueEntityId";
+import { UniqueEntityId } from "@/core/entities/UniqueEntityId";
+import { NotAllowedError } from "@/core/errors/NotAllowedError";
+import { makeQuestionAttachment } from "@test/factories/MakeQuestionAttachment";
+import { InMemoryQuestionAttachmentsRepository } from "@test/repositories/InMemoryQuestionAttachmentsRepository";
 
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
+let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachmentsRepository;
 let sut: DeleteQuestionUseCase;
 
 describe("Given the delete question use case", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    inMemoryQuestionsRepository = new InMemoryQuestionsRepository();
+    inMemoryQuestionAttachmentsRepository =
+      new InMemoryQuestionAttachmentsRepository();
+    inMemoryQuestionsRepository = new InMemoryQuestionsRepository(
+      inMemoryQuestionAttachmentsRepository
+    );
     sut = new DeleteQuestionUseCase(inMemoryQuestionsRepository);
   });
 
@@ -26,13 +33,23 @@ describe("Given the delete question use case", () => {
       new UniqueEntityId(mockId)
     );
 
-    inMemoryQuestionsRepository.create(questionToCreate);
+    await inMemoryQuestionsRepository.create(questionToCreate);
+
+    inMemoryQuestionAttachmentsRepository.items.push(
+      makeQuestionAttachment({
+        questionId: questionToCreate.id,
+        attachmentId: new UniqueEntityId("1"),
+      }),
+      makeQuestionAttachment({
+        questionId: questionToCreate.id,
+        attachmentId: new UniqueEntityId("2"),
+      })
+    );
 
     await sut.execute({ authorId: mockAuthorId, questionId: mockId });
 
-    const hasQuestion = await inMemoryQuestionsRepository.findById(mockId);
-
-    expect(hasQuestion).toBeNull();
+    expect(inMemoryQuestionsRepository.items).toHaveLength(0);
+    expect(inMemoryQuestionAttachmentsRepository.items).toHaveLength(0);
   });
 
   it("should throw an error when the authorId is different", async () => {

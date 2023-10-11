@@ -1,6 +1,6 @@
 /* eslint-disable default-param-last */
 
-import { UniqueEntityId } from "@/core/entity/UniqueEntityId";
+import { UniqueEntityId } from "@/core/entities/UniqueEntityId";
 import { Answer, AnswerProps } from "@/domain/forum/enterprise/entities/Answer";
 import { faker } from "@faker-js/faker";
 

@@ -1,6 +1,6 @@
 /* eslint-disable default-param-last */
 
-import { UniqueEntityId } from "@/core/entity/UniqueEntityId";
+import { UniqueEntityId } from "@/core/entities/UniqueEntityId";
 import {
   AnswerComment,
   AnswerCommentProps,

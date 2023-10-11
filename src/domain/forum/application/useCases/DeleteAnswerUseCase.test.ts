@@ -3,9 +3,12 @@ import { InMemoryAnswersRepository } from "test/repositories/InMemoryAnswersRepo
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DeleteAnswerUseCase } from "./DeleteAnswerUseCase";
-import { NotAllowedError } from "./errors/NotAllowedError";
-import { UniqueEntityId } from "@/core/entity/UniqueEntityId";
+import { UniqueEntityId } from "@/core/entities/UniqueEntityId";
+import { makeAnswerAttachment } from "@test/factories/MakeAnswerAttachment";
+import { InMemoryAnswerAttachmentsRepository } from "@test/repositories/InMemoryAnswerAttachmentsRepository";
+import { NotAllowedError } from "@/core/errors/NotAllowedError";
 
+let inMemoryAnswerAttachmentsRepository: InMemoryAnswerAttachmentsRepository;
 let inMemoryAnswersRepository: InMemoryAnswersRepository;
 let sut: DeleteAnswerUseCase;
 
@@ -13,7 +16,11 @@ describe("Given the delete answer use case", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    inMemoryAnswersRepository = new InMemoryAnswersRepository();
+    inMemoryAnswerAttachmentsRepository =
+      new InMemoryAnswerAttachmentsRepository();
+    inMemoryAnswersRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachmentsRepository
+    );
     sut = new DeleteAnswerUseCase(inMemoryAnswersRepository);
   });
 
@@ -21,30 +28,42 @@ describe("Given the delete answer use case", () => {
     const mockId = "123";
     const mockAuthorId = "authorId";
 
-    const questionToCreate = makeAnswer(
+    const answerToCreate = makeAnswer(
       { authorId: new UniqueEntityId(mockAuthorId) },
       new UniqueEntityId(mockId)
     );
 
-    inMemoryAnswersRepository.create(questionToCreate);
+    await inMemoryAnswersRepository.create(answerToCreate);
+
+    inMemoryAnswerAttachmentsRepository.items.push(
+      makeAnswerAttachment({
+        answerId: answerToCreate.id,
+        attachmentId: new UniqueEntityId("1"),
+      }),
+      makeAnswerAttachment({
+        answerId: answerToCreate.id,
+        attachmentId: new UniqueEntityId("2"),
+      })
+    );
 
     await sut.execute({ authorId: mockAuthorId, answerId: mockId });
 
-    const hasQuestion = await inMemoryAnswersRepository.findById(mockId);
+    const hasAnswer = await inMemoryAnswersRepository.findById(mockId);
 
-    expect(hasQuestion).toBeNull();
+    expect(hasAnswer).toBeNull();
+    expect(inMemoryAnswerAttachmentsRepository.items).toHaveLength(0);
   });
 
   it("should throw an error when the authorId is different", async () => {
     const mockId = "123";
     const mockAuthorId = "authorId";
 
-    const questionToCreate = makeAnswer(
+    const answerToCreate = makeAnswer(
       { authorId: new UniqueEntityId(mockAuthorId) },
       new UniqueEntityId(mockId)
     );
 
-    inMemoryAnswersRepository.create(questionToCreate);
+    inMemoryAnswersRepository.create(answerToCreate);
 
     const result = await sut.execute({
       authorId: "different-authorId",

@@ -5,19 +5,35 @@ import { InMemoryQuestionsRepository } from "test/repositories/InMemoryQuestions
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ChooseQuestionBestAnswerUseCase } from "./ChooseQuestionBestAnswerUseCase";
-import { NotAllowedError } from "./errors/NotAllowedError";
-import { UniqueEntityId } from "@/core/entity/UniqueEntityId";
+import { UniqueEntityId } from "@/core/entities/UniqueEntityId";
+import { NotAllowedError } from "@/core/errors/NotAllowedError";
+import { InMemoryAnswerAttachmentsRepository } from "@test/repositories/InMemoryAnswerAttachmentsRepository";
+import { InMemoryQuestionAttachmentsRepository } from "@test/repositories/InMemoryQuestionAttachmentsRepository";
 
 let inMemoryAnswersRepository: InMemoryAnswersRepository;
+let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachmentsRepository;
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
+let inMemoryAnswerAttachmentsRepository: InMemoryAnswerAttachmentsRepository;
 let sut: ChooseQuestionBestAnswerUseCase;
 
 describe("Choose Question best answer", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    inMemoryAnswersRepository = new InMemoryAnswersRepository();
-    inMemoryQuestionsRepository = new InMemoryQuestionsRepository();
+    inMemoryAnswerAttachmentsRepository =
+      new InMemoryAnswerAttachmentsRepository();
+
+    inMemoryQuestionAttachmentsRepository =
+      new InMemoryQuestionAttachmentsRepository();
+
+    inMemoryQuestionsRepository = new InMemoryQuestionsRepository(
+      inMemoryQuestionAttachmentsRepository
+    );
+
+    inMemoryAnswersRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachmentsRepository
+    );
+
     sut = new ChooseQuestionBestAnswerUseCase(
       inMemoryAnswersRepository,
       inMemoryQuestionsRepository

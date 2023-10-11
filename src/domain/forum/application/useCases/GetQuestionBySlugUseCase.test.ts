@@ -4,15 +4,23 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Slug } from "../../enterprise/entities/valueObjects/Slug";
 import { GetQuestionBySlugUseCase } from "./GetQuestionBySlugUseCase";
+import { InMemoryQuestionAttachmentsRepository } from "@test/repositories/InMemoryQuestionAttachmentsRepository";
 
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
+let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachmentsRepository;
 let sut: GetQuestionBySlugUseCase;
 
 describe("Given the get question by slug use case", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    inMemoryQuestionsRepository = new InMemoryQuestionsRepository();
+    inMemoryQuestionAttachmentsRepository =
+      new InMemoryQuestionAttachmentsRepository();
+
+    inMemoryQuestionsRepository = new InMemoryQuestionsRepository(
+      inMemoryQuestionAttachmentsRepository
+    );
+
     sut = new GetQuestionBySlugUseCase(inMemoryQuestionsRepository);
   });
 
@@ -29,6 +37,10 @@ describe("Given the get question by slug use case", () => {
       slug: mockSlug,
     });
 
-    expect(result.value?.question.slug.value).toEqual(mockSlug);
+    expect(result.value).toMatchObject({
+      question: expect.objectContaining({
+        slug: { value: mockSlug },
+      }),
+    });
   });
 });

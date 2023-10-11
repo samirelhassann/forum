@@ -3,9 +3,12 @@ import { InMemoryAnswersRepository } from "test/repositories/InMemoryAnswersRepo
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EditAnswerUseCase } from "./EditAnswerUseCase";
-import { NotAllowedError } from "./errors/NotAllowedError";
-import { UniqueEntityId } from "@/core/entity/UniqueEntityId";
+import { UniqueEntityId } from "@/core/entities/UniqueEntityId";
+import { NotAllowedError } from "@/core/errors/NotAllowedError";
+import { makeAnswerAttachment } from "@test/factories/MakeAnswerAttachment";
+import { InMemoryAnswerAttachmentsRepository } from "@test/repositories/InMemoryAnswerAttachmentsRepository";
 
+let inMemoryAnswerAttachmentsRepository: InMemoryAnswerAttachmentsRepository;
 let inMemoryAnswersRepository: InMemoryAnswersRepository;
 let sut: EditAnswerUseCase;
 
@@ -13,8 +16,15 @@ describe("Given the delete answer use case", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    inMemoryAnswersRepository = new InMemoryAnswersRepository();
-    sut = new EditAnswerUseCase(inMemoryAnswersRepository);
+    inMemoryAnswerAttachmentsRepository =
+      new InMemoryAnswerAttachmentsRepository();
+    inMemoryAnswersRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachmentsRepository
+    );
+    sut = new EditAnswerUseCase(
+      inMemoryAnswersRepository,
+      inMemoryAnswerAttachmentsRepository
+    );
   });
 
   it("should delete the answer by id", async () => {
@@ -29,15 +39,37 @@ describe("Given the delete answer use case", () => {
 
     inMemoryAnswersRepository.create(answerToCreate);
 
+    inMemoryAnswerAttachmentsRepository.items.push(
+      makeAnswerAttachment({
+        answerId: answerToCreate.id,
+        attachmentId: new UniqueEntityId("1"),
+      }),
+      makeAnswerAttachment({
+        answerId: answerToCreate.id,
+        attachmentId: new UniqueEntityId("2"),
+      })
+    );
+
     await sut.execute({
       authorId: mockAuthorId,
       answerId: mockId,
       content: mockContent,
+      attachmentsIds: ["1", "3"],
     });
 
     const hasAnswer = await inMemoryAnswersRepository.findById(mockId);
 
     expect(hasAnswer?.content).toBe(mockContent);
+    expect(inMemoryAnswersRepository.items[0].attachments.currentItems).toEqual(
+      [
+        expect.objectContaining({
+          attachmentId: expect.objectContaining({ value: "1" }),
+        }),
+        expect.objectContaining({
+          attachmentId: expect.objectContaining({ value: "3" }),
+        }),
+      ]
+    );
   });
 
   it("should throw an error when the authorId is different", async () => {
@@ -56,6 +88,7 @@ describe("Given the delete answer use case", () => {
       authorId: "different-authorId",
       answerId: mockId,
       content: mockContent,
+      attachmentsIds: [],
     });
 
     expect(result.isLeft()).toBeTruthy();

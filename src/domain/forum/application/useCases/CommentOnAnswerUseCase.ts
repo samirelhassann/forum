@@ -1,10 +1,10 @@
 import { AnswerComment } from "../../enterprise/entities/AnswerComment";
 import { AnswerCommentsRepository } from "../repositories/AnswerCommentsRepository";
 import { AnswersRepository } from "../repositories/AnswersRepository";
-import { NotAllowedError } from "./errors/NotAllowedError";
-import { ResourceNotFoundError } from "./errors/ResourceNotFoundError";
 import { Either, left, right } from "@/core/Either";
-import { UniqueEntityId } from "@/core/entity/UniqueEntityId";
+import { UniqueEntityId } from "@/core/entities/UniqueEntityId";
+import { NotAllowedError } from "@/core/errors/NotAllowedError";
+import { ResourceNotFoundError } from "@/core/errors/ResourceNotFoundError";
 
 interface CommentOnAnswerUseCaseRequest {
   authorId: string;

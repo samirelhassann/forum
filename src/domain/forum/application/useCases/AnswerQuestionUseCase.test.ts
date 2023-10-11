@@ -2,8 +2,10 @@ import { InMemoryAnswersRepository } from "test/repositories/InMemoryAnswersRepo
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AnswerQuestionUseCase } from "./AnswerQuestionUseCase";
+import { InMemoryAnswerAttachmentsRepository } from "@test/repositories/InMemoryAnswerAttachmentsRepository";
 
 let inMemoryAnswerRepository: InMemoryAnswersRepository;
+let inMemoryAnswerAttachmentsRepository: InMemoryAnswerAttachmentsRepository;
 let sut: AnswerQuestionUseCase;
 
 describe("Given the Answer Question Use Case", () => {
@@ -12,7 +14,12 @@ describe("Given the Answer Question Use Case", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    inMemoryAnswerRepository = new InMemoryAnswersRepository();
+    inMemoryAnswerAttachmentsRepository =
+      new InMemoryAnswerAttachmentsRepository();
+
+    inMemoryAnswerRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachmentsRepository
+    );
     sut = new AnswerQuestionUseCase(inMemoryAnswerRepository);
   });
 
@@ -21,11 +28,21 @@ describe("Given the Answer Question Use Case", () => {
       instructorId: "1",
       questionId: "1",
       content,
+      attachmentsIds: ["1", "2"],
     });
 
     expect(result.isRight()).toBeTruthy();
     expect(
       inMemoryAnswerRepository.items.find((i) => i.content === content)
     ).toBeTruthy();
+
+    expect(inMemoryAnswerRepository.items[0].attachments.currentItems).toEqual([
+      expect.objectContaining({
+        attachmentId: expect.objectContaining({ value: "1" }),
+      }),
+      expect.objectContaining({
+        attachmentId: expect.objectContaining({ value: "2" }),
+      }),
+    ]);
   });
 });

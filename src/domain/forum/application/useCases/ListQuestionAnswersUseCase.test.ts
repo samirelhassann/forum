@@ -3,9 +3,11 @@ import { InMemoryAnswersRepository } from "test/repositories/InMemoryAnswersRepo
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ListQuestionAnswersUseCase } from "./ListQuestionAnswersUseCase";
-import { UniqueEntityId } from "@/core/entity/UniqueEntityId";
+import { UniqueEntityId } from "@/core/entities/UniqueEntityId";
+import { InMemoryAnswerAttachmentsRepository } from "@test/repositories/InMemoryAnswerAttachmentsRepository";
 
 let inMemoryAnswersRepository: InMemoryAnswersRepository;
+let inMemoryAnswerAttachmentsRepository: InMemoryAnswerAttachmentsRepository;
 let sut: ListQuestionAnswersUseCase;
 
 describe("List Question Answers Use Case", () => {
@@ -14,7 +16,12 @@ describe("List Question Answers Use Case", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    inMemoryAnswersRepository = new InMemoryAnswersRepository();
+    inMemoryAnswerAttachmentsRepository =
+      new InMemoryAnswerAttachmentsRepository();
+
+    inMemoryAnswersRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachmentsRepository
+    );
     sut = new ListQuestionAnswersUseCase(inMemoryAnswersRepository);
   });
 

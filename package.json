@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "ts-check": "tsc --noEmit",
     "dev": "tsx watch src/server.ts",
     "prod": "node build/server.js",
     "build": "tsup src --out-dir build",

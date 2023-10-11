@@ -2,11 +2,16 @@ import {
   DEFAULT_PAGE_SIZE,
   PaginationParams,
 } from "@/core/repositories/PaginationParams";
+import { QuestionAttachmentsRepository } from "@/domain/forum/application/repositories/QuestionAttachmentsRepository";
 import { QuestionsRepository } from "@/domain/forum/application/repositories/QuestionsRepository";
 import { Question } from "@/domain/forum/enterprise/entities/Question";
 
 export class InMemoryQuestionsRepository implements QuestionsRepository {
   public items: Question[] = [];
+
+  constructor(
+    private questionAttachmentsRepository: QuestionAttachmentsRepository
+  ) {}
 
   async create(question: Question): Promise<Question> {
     this.items.push(question);
@@ -22,6 +27,7 @@ export class InMemoryQuestionsRepository implements QuestionsRepository {
 
   async delete(id: string): Promise<void> {
     this.items = this.items.filter((item) => item.id.toString() !== id);
+    this.questionAttachmentsRepository.deleteManyByQuestionId(id);
   }
 
   async findById(id: string): Promise<Question | null> {

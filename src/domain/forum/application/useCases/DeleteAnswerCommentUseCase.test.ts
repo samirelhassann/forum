@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DeleteAnswerCommentUseCase } from "./DeleteAnswerCommentUseCase";
-import { NotAllowedError } from "./errors/NotAllowedError";
-import { ResourceNotFoundError } from "./errors/ResourceNotFoundError";
-import { UniqueEntityId } from "@/core/entity/UniqueEntityId";
+import { UniqueEntityId } from "@/core/entities/UniqueEntityId";
+import { NotAllowedError } from "@/core/errors/NotAllowedError";
+import { ResourceNotFoundError } from "@/core/errors/ResourceNotFoundError";
 import { makeAnswerComment } from "@test/factories/MakeAnswerComment";
 import { InMemoryAnswerCommentRepository } from "@test/repositories/InMemoryAnswerCommentRepository";
 

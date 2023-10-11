@@ -2,11 +2,13 @@ import { makeAnswer } from "test/factories/MakeAnswer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CommentOnAnswerUseCase } from "./CommentOnAnswerUseCase";
-import { UniqueEntityId } from "@/core/entity/UniqueEntityId";
+import { UniqueEntityId } from "@/core/entities/UniqueEntityId";
+import { InMemoryAnswerAttachmentsRepository } from "@test/repositories/InMemoryAnswerAttachmentsRepository";
 import { InMemoryAnswerCommentRepository } from "@test/repositories/InMemoryAnswerCommentRepository";
 import { InMemoryAnswersRepository } from "@test/repositories/InMemoryAnswersRepository";
 
 let inMemoryAnswersRepository: InMemoryAnswersRepository;
+let inMemoryAnswerAttachmentsRepository: InMemoryAnswerAttachmentsRepository;
 let inMemoryAnswerCommentRepository: InMemoryAnswerCommentRepository;
 let sut: CommentOnAnswerUseCase;
 
@@ -14,7 +16,12 @@ describe("Given the Comment on Answer Use Case", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    inMemoryAnswersRepository = new InMemoryAnswersRepository();
+    inMemoryAnswerAttachmentsRepository =
+      new InMemoryAnswerAttachmentsRepository();
+
+    inMemoryAnswersRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachmentsRepository
+    );
     inMemoryAnswerCommentRepository = new InMemoryAnswerCommentRepository();
     sut = new CommentOnAnswerUseCase(
       inMemoryAnswersRepository,
@@ -35,6 +42,8 @@ describe("Given the Comment on Answer Use Case", () => {
       content,
     });
 
-    expect(result.value?.answerComment.content).toEqual(content);
+    expect(result.value).toMatchObject({
+      answerComment: expect.objectContaining({ content }),
+    });
   });
 });
