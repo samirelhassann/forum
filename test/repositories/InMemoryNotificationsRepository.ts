@@ -2,7 +2,7 @@ import { NotificationRepository } from "@/domain/notification/application/reposi
 import { Notification } from "@/domain/notification/enterprise/entities/Notification";
 
 export class InMemoryNotificationRepository implements NotificationRepository {
-  public items: Notification[] = [];
+  items: Notification[] = [];
 
   async create(notification: Notification): Promise<void> {
     this.items.push(notification);

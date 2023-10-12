@@ -1,3 +1,4 @@
+import { DomainEvents } from "@/core/events/DomainEvents";
 import {
   DEFAULT_PAGE_SIZE,
   PaginationParams,
@@ -15,6 +16,8 @@ export class InMemoryQuestionsRepository implements QuestionsRepository {
 
   async create(question: Question): Promise<Question> {
     this.items.push(question);
+
+    DomainEvents.dispatchEventsForAggregate(question.id);
 
     return question;
   }
@@ -44,6 +47,8 @@ export class InMemoryQuestionsRepository implements QuestionsRepository {
 
       return q;
     });
+
+    DomainEvents.dispatchEventsForAggregate(question.id);
 
     return question;
   }
